@@ -18,6 +18,8 @@ var dy = 0;
 
 var scale = 1;
 
+var angle = 0;
+
 //clip middle
 var clipMid_x = 0;
 var clipMid_y = 0;
@@ -71,6 +73,17 @@ canvas.addEventListener('mousemove', e => {
 
       scale = d/d0;
 
+			let sine = (e.clientY - clipMid_y - dy) / d;
+			let cosine = (e.clientX - clipMid_x - dx) / d;
+
+			let angleController = getAngle(sine,cosine);
+
+      let sine0 = (clipPoints[0][1] - clipMid_y) / d0;
+			let cosine0 = (clipPoints[0][0] - clipMid_x) / d0;
+
+			let angle0 = getAngle(sine0,cosine0);
+
+			angle = angleController - angle0;
 		} else {
 			dragged[0] = e.clientX;
 			dragged[1] = e.clientY;
@@ -125,6 +138,7 @@ function drawRecursive() {
 		ctx.translate(dx, dy);
 
 		ctx.scale(scale, scale);
+		ctx.rotate(angle);
 
 		ctx.translate(-clipMid_x, -clipMid_y);
 		ctx.drawImage(clipCanvas, 0, 0);
@@ -165,8 +179,10 @@ function drawGUI() {
 	let rel_y = clipPoints[0][1] - clipMid_y;
 	rel_y *= scale;
 
-	controller_x = rel_x + clipMid_x + dx;
-	controller_y = rel_y + clipMid_y + dy;
+	controller_x = Math.cos(angle) * rel_x - Math.sin(angle) * rel_y;
+	controller_y = Math.sin(angle) * rel_x + Math.cos(angle) * rel_y;
+	controller_x += clipMid_x + dx;
+	controller_y += clipMid_y + dy;
 
 	ctx.fillStyle = 'red';
 	ctx.beginPath();
@@ -196,4 +212,11 @@ function updateClipMiddle(){
 
 	clipMid_x /= clipPoints.length;
 	clipMid_y /= clipPoints.length;
+}
+
+function getAngle(s, c) {
+  if(c >= 0) 
+    return Math.asin(s);
+  else 
+    return Math.PI - Math.asin(s); 
 }
