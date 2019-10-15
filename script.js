@@ -20,7 +20,6 @@ var scale = 1;
 
 var angle = 0;
 
-//clip middle
 var clipMid_x = 0;
 var clipMid_y = 0;
 
@@ -87,8 +86,22 @@ canvas.addEventListener('mousemove', e => {
 		} else {
 			dragged[0] = e.clientX;
 			dragged[1] = e.clientY;
+   
+      let rel_x = -clipMid_x*scale;
+      let rel_y = -clipMid_y*scale;
+      let newDx = Math.cos(angle) * rel_x - Math.sin(angle) * rel_y + clipMid_x + dx;
+      let newDy = Math.sin(angle) * rel_x + Math.cos(angle) * rel_y + clipMid_y + dy;
 
       updateClipMiddle();
+
+      rel_x = -clipMid_x*scale;
+      rel_y = -clipMid_y*scale;
+      newDx -= Math.cos(angle) * rel_x - Math.sin(angle) * rel_y + clipMid_x;
+      newDy -= Math.sin(angle) * rel_x + Math.cos(angle) * rel_y + clipMid_y;
+
+      //compensation of image shift
+      dx = newDx;
+      dy = newDy;
 		}
 	} else if (e.buttons > 0) {
 		dx += e.clientX - x;
