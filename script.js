@@ -2,13 +2,33 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const image = new Image();
 
+const dropzone = document.getElementById('canvas');
+
 const clipCanvas = document.createElement('canvas');
 const clipCtx = clipCanvas.getContext('2d');
 var clipPoints = [];
 
+dropzone.ondrop = function(e) {
+  e.preventDefault();
+  //this.className = 'dropzone';
+  var reader = new FileReader();
+  reader.readAsDataURL(e.dataTransfer.files[0]);
+	reader.onload = function (e) {
+		image.src=e.target.result;
+  };
+};
+
+dropzone.ondragover = function() {
+  //this.className = 'dropzone dragover';
+  return false;
+};/*
+dropzone.ondragleave = function() {
+  //this.className = 'dropzone';
+  return false;
+};*/
+
 image.onload = onLoad;
-//image.src = 'img.jpg';
-image.src = 'hulkhogan2.jpg';
+image.src = 'drop.png';
 
 var x = 0;
 var y = 0;
@@ -17,7 +37,6 @@ var dx = 0;
 var dy = 0;
 
 var scale = 1;
-
 var angle = 0;
 
 var clipMid_x = 0;
@@ -31,7 +50,7 @@ var createPoints = true;
 
 canvas.addEventListener('mousedown', e => {
 	x = e.clientX;
-	y = e.clientY;
+  y = e.clientY - canvas.offsetTop;
 
 	if ((controller_x - x) ** 2 + (controller_y - y) ** 2 < 169) {
 		dragged = "controller";
@@ -52,6 +71,7 @@ canvas.addEventListener('mousedown', e => {
 		updateClipMiddle();
 	}
 	drawRecursive();
+  drawGUI();
 });
 
 canvas.addEventListener('mouseup', e => {
@@ -65,14 +85,14 @@ canvas.addEventListener('mousemove', e => {
       //default distance between clip middle and controller
 			let d0 = (clipPoints[0][0] - clipMid_x) ** 2 + (clipPoints[0][1] - clipMid_y) ** 2;
       //new distance between clip middle and controller
-			let d = (clipMid_x + dx - e.clientX) ** 2 + (clipMid_y + dy - e.clientY) ** 2;
+			let d = (clipMid_x + dx - e.clientX) ** 2 + (clipMid_y + dy - e.clientY + canvas.offsetTop) ** 2;
 
 			d0 = Math.sqrt(d0);
 			d = Math.sqrt(d);
 
       scale = d/d0;
 
-			let sine = (e.clientY - clipMid_y - dy) / d;
+			let sine = (e.clientY - canvas.offsetTop - clipMid_y - dy) / d;
 			let cosine = (e.clientX - clipMid_x - dx) / d;
 
 			let angleController = getAngle(sine,cosine);
@@ -85,7 +105,7 @@ canvas.addEventListener('mousemove', e => {
 			angle = angleController - angle0;
 		} else {
 			dragged[0] = e.clientX;
-			dragged[1] = e.clientY;
+			dragged[1] = e.clientY - canvas.offsetTop;
    
       let rel_x = -clipMid_x*scale;
       let rel_y = -clipMid_y*scale;
@@ -105,25 +125,12 @@ canvas.addEventListener('mousemove', e => {
 		}
 	} else if (e.buttons > 0) {
 		dx += e.clientX - x;
-		dy += e.clientY - y;
+		dy += e.clientY - canvas.offsetTop - y;
 		x = e.clientX;
-		y = e.clientY;
+		y = e.clientY - canvas.offsetTop;
 	}
 	drawRecursive();
-});
-
-document.addEventListener("keydown", e => {
-	if (e.keyCode == 87) {
-		scale *= 1.04;
-		scale *= 1.04;
-	} else if (e.keyCode == 83) {
-		scale *= 0.96;
-		scale *= 0.96;
-	} else {
-		createPoints = false;
-		console.log("koniec");
-	}
-	drawRecursive();
+  drawGUI();
 });
 
 function drawRecursive() {
@@ -160,13 +167,22 @@ function drawRecursive() {
 
 	clipCtx.restore();
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
-	drawGUI();
 }
 
 function drawGUI() {
 	if (clipPoints.length == 0) return;
 
-	ctx.strokeStyle = 'white';
+	ctx.strokeStyle = 'black';
+	ctx.lineWidth = 5;
+	ctx.beginPath();
+	ctx.moveTo(clipPoints[0][0], clipPoints[0][1]);
+	for (let p of clipPoints) {
+		ctx.lineTo(p[0], p[1]);
+	}
+	ctx.closePath();
+	ctx.stroke();
+
+  ctx.strokeStyle = 'white';
 	ctx.lineWidth = 3;
 	ctx.beginPath();
 	ctx.moveTo(clipPoints[0][0], clipPoints[0][1]);
@@ -210,7 +226,7 @@ function onLoad() {
 	canvas.height = this.naturalHeight;
 	clipCanvas.width = this.naturalWidth;
 	clipCanvas.height = this.naturalHeight;
-	drawRecursive();
+  reset();
 }
 
 function updateClipMiddle(){
@@ -232,4 +248,37 @@ function getAngle(s, c) {
     return Math.asin(s);
   else 
     return Math.PI - Math.asin(s); 
+}
+
+function switchLock(unlock = false) {
+  var btn = document.getElementById('lockBtn');
+  if(!createPoints || unlock){
+    createPoints = true;
+    lockBtn.innerText = "Lock creating points";
+  }
+  else{
+    createPoints = false;
+    lockBtn.innerText = "Unlock creating points";
+  }
+}
+
+function saveImage() {
+  var link = document.createElement('a');
+  link.download = 'recursion.png';
+
+  drawRecursive();
+  link.href = canvas.toDataURL();
+  drawGUI();
+
+  link.click();
+}
+
+function reset() {
+  clipPoints = [];
+  switchLock(true);
+  dx = 0;
+  dy = 0;
+  scale = 1;
+  angle = 0;
+  drawRecursive();
 }
