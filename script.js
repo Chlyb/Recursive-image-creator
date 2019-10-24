@@ -10,7 +10,6 @@ var clipPoints = [];
 
 dropzone.ondrop = function(e) {
   e.preventDefault();
-  //this.className = 'dropzone';
   var reader = new FileReader();
   reader.readAsDataURL(e.dataTransfer.files[0]);
 	reader.onload = function (e) {
@@ -19,13 +18,8 @@ dropzone.ondrop = function(e) {
 };
 
 dropzone.ondragover = function() {
-  //this.className = 'dropzone dragover';
   return false;
-};/*
-dropzone.ondragleave = function() {
-  //this.className = 'dropzone';
-  return false;
-};*/
+};
 
 image.onload = onLoad;
 image.src = 'drop.png';
@@ -47,6 +41,8 @@ var controller_y;
 
 var dragged = null;
 var createPoints = true;
+
+var iterationCount = 10;
 
 canvas.addEventListener('mousedown', e => {
 	x = e.clientX;
@@ -154,7 +150,7 @@ function drawRecursive() {
 
 	ctx.translate(clipMid_x, clipMid_y);
 
-	for (let i = 0; i < 10; i++) {
+	for (let i = 0; i < iterationCount; i++) {
 		ctx.translate(dx, dy);
 
 		ctx.scale(scale, scale);
@@ -281,4 +277,28 @@ function reset() {
   scale = 1;
   angle = 0;
   drawRecursive();
+}
+
+function setInput() {
+  scale = parseFloat( document.getElementById('scaleIn').value);
+  angle = parseFloat( document.getElementById('rotationIn').value);
+  dx = parseFloat( document.getElementById('dxIn').value);
+  dy = parseFloat( document.getElementById('dyIn').value);
+  iterationCount = parseInt( document.getElementById('iterationsIn').value);
+
+  drawRecursive();
+  drawGUI();
+}
+
+function switchInput() {
+  var manualInput = document.getElementById('manualInput');
+  var btn = document.getElementById('inputBtn');
+  if( btn.innerText == "Show input") {
+    btn.innerText = "Hide input";
+    manualInput.style.display = 'block';
+  }
+  else {
+    btn.innerText = "Show input";
+    manualInput.style.display = 'none';
+  }
 }

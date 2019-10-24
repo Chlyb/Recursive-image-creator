@@ -9,6 +9,16 @@
     <button class="button" onclick="switchLock()" id="lockBtn"> Lock creating points </button>
     <button class="button" onclick="saveImage()" id="saveBtn"> Save image </button>
     <button class="button" onclick="reset()" id="resetBtn"> Reset </button>
+    <button class="button" onclick="switchInput()" id="inputBtn"> Show input </button>
+  </div>
+
+  <div class="sidenav" id = "manualInput">
+    <p> Scale <input type="number" id="scaleIn" value="1" step="0.1"> </p>
+    <p> Rotation <input type="number" id="rotationIn" value="0" step="0.1"> </p> 
+    <p> Offset x <input type="number" id="dxIn" value="0"> </p>
+    <p> Offset y <input type="number" id="dyIn" value="0"> </p>
+    <p> Iterations <input type="number" id="iterationsIn" value="10"> </p>
+    <button class="button" onclick="setInput()" id="setBtn"> Set</button>  
   </div>
 
   <canvas id="canvas"></canvas>

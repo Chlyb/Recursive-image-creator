@@ -1,6 +1,6 @@
 body {
   margin: 0;
-   padding: 0;
+  padding: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -9,7 +9,7 @@ body {
   background-color: #333;
 }
 
-.button {
+.topnav button {
   font-size: 16px; 
   border: none;
   outline: none;
@@ -20,6 +20,43 @@ body {
   margin: 0; /* Important for vertical align on mobile phones */
 }
 
-.button:hover {
+button:hover {
+  background-color: red;
+}
+
+input {
+  width: 48%;
+  float: right;
+  padding: 0px 0px;
+  margin: 0px 0px;
+  box-sizing: border-box;
+}
+
+.sidenav {
+  display: none;
+  width: 130px;
+  position: fixed;
+  z-index: 1;
+  top: 120px;
+  right: 0px;
+  background: #999;
+  overflow-x: hidden;
+  padding: 0px 7px;
+  color:white;
+}
+
+.sidenav button {
+  font-size: 16px; 
+  width:100%;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: #666;
+  font-family: inherit; /* Important for vertical align on mobile phones */
+  margin: 0; /* Important for vertical align on mobile phones */
+}
+
+.sidenav button:hover {
   background-color: red;
 }
